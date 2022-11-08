@@ -1,2 +1,2 @@
 # study-hall
-a study suite web app with tools for students
+A study suite web app with tools for students
