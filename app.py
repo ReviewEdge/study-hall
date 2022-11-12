@@ -8,14 +8,14 @@ script_dir = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(script_dir)
 
 from flask import Flask, request, render_template, redirect, url_for
-from flask import flash
+from flask import flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 
 # user authentication
 from flask_login import UserMixin, LoginManager, login_required
 from flask_login import login_user, logout_user, current_user
 from password_hasher import PasswordHasher
-from forms.loginforms import RegisterForm, LoginForm
+from forms.account_forms import RegisterForm, LoginForm, EditAccountForm
 
 ###############################################################################
 # Basic Configuration
@@ -37,6 +37,11 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['SECRET_KEY'] = 'correcthorsebatterystaple'
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{dbfile}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# make current_user available on all pages without passing it in to each template every time
+@app.context_processor
+def inject_current_user():
+    return dict(current_user=current_user)
 
 db = SQLAlchemy(app)
 
@@ -94,7 +99,9 @@ def post_register():
             user = User(name=form.name.data, email=form.email.data, password=form.password.data)
             db.session.add(user)
             db.session.commit()
-            return redirect(url_for('get_login'))
+            login_user(user)
+            flash("Account created. Welcome!")
+            return redirect(url_for('index'))
         else: # if the user already exists
             # flash a warning message and redirect to get registration form
             flash('There is already an account with that email address')
@@ -147,13 +154,47 @@ def get_logout():
 # user account
 @app.get('/account')
 @login_required
-def account():
-    return render_template('account/edit.html')
+def get_account():
+    form = EditAccountForm()
+    return render_template('account/edit.html', form=form)
+
+@app.post('/account')
+@login_required
+def post_account():
+    form = EditAccountForm()
+    if form.validate():
+        user = load_user(current_user.get_id())
+        if user.verify_password(form.current_password.data):
+            user.name = form.name.data
+            user.email = form.email.data
+            if form.new_password.data is not None and form.new_password.data != "":
+                user.password = form.new_password.data
+            db.session.commit()
+            flash("Account updated")
+        else:
+            flash("Current password is not correct")
+    else: # if the form was invalid
+        # flash error messages and redirect to get registration form again
+        for field, error in form.errors.items():
+            flash(f"{field}: {error}")
+    return redirect(url_for('get_account'))
+
+@app.delete('/api/account')
+@login_required
+def delete_account():
+    user = load_user(current_user.get_id())
+    db.session.delete(user)
+    db.session.commit()
+    logout_user()
+    flash('Your account has been deleted')
+    return jsonify({
+        "redirectTo": url_for('index'),
+    })
 
 # home page
 @app.get('/')
 def index():
-    return render_template('index.html', current_user=current_user)
+    return render_template('index.html')
 
 # notes
 @app.get('/notes')

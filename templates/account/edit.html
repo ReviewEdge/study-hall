@@ -2,8 +2,57 @@
 
 {% block head %}
   {{ super() }}
+  <script src="/static/scripts/account.js"></script>
 {% endblock %}
 
 {% block content %}
-  <h1>My Account</h1>
+<h1>My Account</h1>
+
+<div class="card my-3">
+  <div class="card-body">
+    <h4>Update Account</h4>
+    <form method="POST" action="/account">
+      {{form.hidden_tag()}}
+
+      <div class="mb-2">
+        {{ form.name.label }}
+        {{ form.name(class="form-control", value=current_user.name) }}
+      </div>
+
+      <div class="mb-2">
+        {{form.email.label}}
+        {{form.email(class="form-control", value=current_user.email)}}
+      </div>
+
+      <div class="mb-2">
+        {{form.new_password.label}}
+        {{form.new_password(class="form-control")}}
+        <p class="text-muted text-xs">Leave blank if you don't want to change it</p>
+      </div>
+
+      <div class="mb-2">
+        {{form.confirm_new_password.label}}
+        {{form.confirm_new_password(class="form-control")}}
+      </div>
+
+      <div class="mb-2">
+        {{form.current_password.label}}
+        {{form.current_password(class="form-control")}}
+        <p class="text-muted text-xs">We need your current password to confirm your changes</p>
+      </div>
+
+      <div class="mb-2">
+        {{form.submit(class="btn btn-dark")}}
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h4>Delete Account</h4>
+    <p class="mb-2">This is permanent!</p>
+    <button id="delete-account" class="btn btn-danger">Delete</button>
+  </div>
+</div>
 {% endblock %}
