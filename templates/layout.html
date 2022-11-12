@@ -32,6 +32,7 @@
           </li>
         </ul>
 
+        {% if current_user %}
         <ul class="navbar-nav ms-auto">
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -39,10 +40,11 @@
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="{{ url_for('account') }}">My Account</a></li>
-              <li><a class="dropdown-item" href="#">Log Out</a></li>
+              <li><a class="dropdown-item" href="{{ url_for('get_logout') }}">Log Out</a></li>
             </ul>
           </li>
         </ul>
+        {% endif %}
       </div>
     </div>
   </nav>
