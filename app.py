@@ -187,10 +187,7 @@ def delete_account():
     db.session.commit()
     logout_user()
     flash('Your account has been deleted')
-    return jsonify({
-        "redirectTo": url_for('index'),
-    })
-
+    return "success", 200
 # home page
 @app.get('/')
 def index():
