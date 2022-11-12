@@ -1,3 +1,7 @@
 (() => {
-  console.log("Hello, world!")
+  window.addEventListener("DOMContentLoaded", async () => {
+    tinymce.init({
+      selector: 'textarea#notes'
+    })
+  })
 })()

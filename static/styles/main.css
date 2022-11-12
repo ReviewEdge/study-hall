@@ -9,3 +9,8 @@ p {
 .text-xs {
   font-size: 12px;
 }
+
+/* hide the "Upgrade" link on the TinyMCE editor */
+.tox-promotion {
+  display: none;
+}

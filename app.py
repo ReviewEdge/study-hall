@@ -188,6 +188,7 @@ def delete_account():
     logout_user()
     flash('Your account has been deleted')
     return "success", 200
+
 # home page
 @app.get('/')
 def index():
@@ -196,5 +197,17 @@ def index():
 # notes
 @app.get('/notes')
 @login_required
-def notes_index():
+def get_notes():
     return render_template('notes/index.html')
+
+@app.get('/notes/<int:id>/edit')
+@login_required
+def get_edit_note(id):
+    print(id)
+    return render_template('notes/edit.html')
+
+# TODO: this will be the public view page if the user chooses to allow it for the note
+@app.get('/notes/<int:id>/view')
+def get_view_note(id):
+    print(id)
+    return render_template('notes/view.html')
