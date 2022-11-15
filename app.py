@@ -75,6 +75,26 @@ class User(UserMixin, db.Model):
     def verify_password(self, pwd):
         return pwd_hasher.check(pwd, self.password_hash)
 
+
+
+# Create database model for Study Sets
+class StudySet(db.Model):
+    __tablename__ = 'StudySets'
+    id = db.Column(db.Integer, primary_key=True)
+    ownerID = db.Column(db.Integer, db.ForeignKey('user.id'))
+    name = db.Column(db.Unicode, nullable=False)
+    flashcards = db.relationship('Flashcard', backref='study_set')
+
+# Create database model for flashcards
+class Flashcard(db.Model):
+    __tablename__ = 'Flashcards'
+    id = db.Column(db.Integer, primary_key=True)
+    setID = db.Column(db.Integer, db.ForeignKey('StudySets.id'))
+    front_text = db.Column(db.Unicode, nullable=False)
+    back_text = db.Column(db.Unicode, nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
+
+
 with app.app_context():
     db.create_all() # this is only needed if the database doesn't already exist
 
@@ -211,3 +231,10 @@ def get_edit_note(id):
 def get_view_note(id):
     print(id)
     return render_template('notes/view.html')
+
+# flashcards
+@app.get('/flashcards')
+@login_required
+def get_flashcards():
+    study_sets = StudySet.query.all()
+    return render_template('flashcards/index.html', study_sets=study_sets)

@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block head %}
+  {{ super() }}
+{% endblock %}
+
+{% block content %}
+  <h1>Your Study Sets</h1>
+  <table cellpadding="7">
+      {% for s in study_sets %}
+          <tr>
+              <td>{{ s.name }}</td>
+          </tr>
+      {% endfor %}
+  </table>
+{% endblock %}

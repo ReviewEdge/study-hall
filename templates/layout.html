@@ -33,8 +33,10 @@
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('get_notes') }}">My Notes</a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('get_flashcards') }}">My Flashcards</a>
+          </li>
         </ul>
-
         <ul class="navbar-nav ms-auto">
         {% if current_user.is_authenticated %}
           <li class="nav-item dropdown">
