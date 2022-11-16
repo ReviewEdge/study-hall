@@ -5,12 +5,22 @@
   <script src="https://code.jquery.com/jquery-3.6.1.slim.min.js" integrity="sha256-w8CvhFs7iHNVUtnSP0YKEg00p9Ih13rlL9zGqvLdePA=" crossorigin="anonymous"></script>
 	<script type="text/javascript" src="/static/scripts/tinymce/tinymce.min.js"></script>
   <script src="/static/scripts/notes.js"></script>
+  <link rel="stylesheet" href="/static/styles/notes.css">
 {% endblock %}
 
 {% block content %}
 <div class="mb-3">
-  <h1 class="mb-0">Note Title Here</h1>
-  <a href="{{ url_for('get_view_note', id=1) }}">View Note</a>
+  <input id="note-title" class="title-input" value="{{ note.title or '' }}" placeholder="Untitled" />
+
+  <div class="d-flex justify-content-between">
+    <a href="{{ url_for('get_view_note', id=note.id) }}">View Note</a>
+    <p id="save-status" class="text-success">
+      <i class="fa-solid fa-check"></i>
+      Saved
+    </p>
+  </div>
 </div>
-<textarea id="notes"></textarea>
+<textarea id="note-content">
+  {{ note.content or "" }}
+</textarea>
 {% endblock %}

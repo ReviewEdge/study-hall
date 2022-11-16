@@ -16,6 +16,7 @@ from flask_login import UserMixin, LoginManager, login_required
 from flask_login import login_user, logout_user, current_user
 from password_hasher import PasswordHasher
 from forms.account_forms import RegisterForm, LoginForm, EditAccountForm
+from forms.new_note_form import NewNoteForm
 
 ###############################################################################
 # Basic Configuration
@@ -62,6 +63,7 @@ class User(UserMixin, db.Model):
     name = db.Column(db.Unicode, nullable=False)
     email = db.Column(db.Unicode, nullable=False)
     password_hash = db.Column(db.LargeBinary) # hash is a binary attribute
+    notes = db.relationship('Note', backref='owner')
 
     # make a write-only password property that just updates the stored hash
     @property
@@ -75,13 +77,11 @@ class User(UserMixin, db.Model):
     def verify_password(self, pwd):
         return pwd_hasher.check(pwd, self.password_hash)
 
-
-
 # Create database model for Study Sets
 class StudySet(db.Model):
     __tablename__ = 'StudySets'
     id = db.Column(db.Integer, primary_key=True)
-    ownerID = db.Column(db.Integer, db.ForeignKey('user.id'))
+    ownerID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.Unicode, nullable=False)
     flashcards = db.relationship('Flashcard', backref='study_set')
 
@@ -89,11 +89,18 @@ class StudySet(db.Model):
 class Flashcard(db.Model):
     __tablename__ = 'Flashcards'
     id = db.Column(db.Integer, primary_key=True)
-    setID = db.Column(db.Integer, db.ForeignKey('StudySets.id'))
+    setID = db.Column(db.Integer, db.ForeignKey('StudySets.id'), nullable=False)
     front_text = db.Column(db.Unicode, nullable=False)
     back_text = db.Column(db.Unicode, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
 
+# Create database model for Study Sets
+class Note(db.Model):
+    __tablename__ = 'Notes'
+    id = db.Column(db.Integer, primary_key=True)
+    ownerID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    title = db.Column(db.Unicode)
+    content = db.Column(db.Unicode)
 
 with app.app_context():
     db.create_all() # this is only needed if the database doesn't already exist
@@ -218,19 +225,38 @@ def index():
 @app.get('/notes')
 @login_required
 def get_notes():
-    return render_template('notes/index.html')
+    form = NewNoteForm()
+    notes = load_user(current_user.get_id()).notes
+    return render_template('notes/index.html', form=form, notes=notes)
+
+@app.post('/notes/create')
+@login_required
+def post_create_note():
+    note = Note(ownerID=current_user.get_id())
+    db.session.add(note)
+    db.session.commit()
+    return redirect(url_for('get_edit_note', id=note.id))
 
 @app.get('/notes/<int:id>/edit')
 @login_required
 def get_edit_note(id):
-    print(id)
-    return render_template('notes/edit.html')
+    note = Note.query.get_or_404(id)
+    return render_template('notes/edit.html', note=note)
 
-# TODO: this will be the public view page if the user chooses to allow it for the note
+@app.patch('/api/notes/<int:id>')
+@login_required
+def update_note(id):
+    note = Note.query.get_or_404(id)
+    note_json = request.get_json()
+    note.title = note_json.get('title')
+    note.content = note_json.get('content')
+    db.session.commit()
+    return "success", 200
+
 @app.get('/notes/<int:id>/view')
 def get_view_note(id):
-    print(id)
-    return render_template('notes/view.html')
+    note = Note.query.get_or_404(id)
+    return render_template('notes/view.html', note=note)
 
 # flashcards
 @app.get('/flashcards')
