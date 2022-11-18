@@ -14,7 +14,7 @@
 
   <div class="mt-5">
     {% for note in notes %}
-      <a href="{{ url_for('get_edit_note', id=note.id) }}">{{ note.title or "Untitled" }}</a>
+      <p><a href="{{ url_for('get_edit_note', id=note.id) }}">{{ note.title or "Untitled" }}</a></p>
     {% endfor %}
   </div>
 {% endblock %}
