@@ -9,7 +9,11 @@
   <table cellpadding="7">
       {% for s in study_sets %}
           <tr>
-              <td>{{ s.name }}</td>
+              <td>
+                <a href="{{ url_for('get_view_study_set', id=s.id) }}">
+                  {{ s.name }}
+                </a>
+              </td>
           </tr>
       {% endfor %}
   </table>

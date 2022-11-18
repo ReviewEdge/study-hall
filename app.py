@@ -10,6 +10,7 @@ sys.path.append(script_dir)
 from flask import Flask, request, render_template, redirect, url_for
 from flask import flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 # user authentication
 from flask_login import UserMixin, LoginManager, login_required
@@ -94,7 +95,7 @@ class Flashcard(db.Model):
     back_text = db.Column(db.Unicode, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
 
-# Create database model for Study Sets
+# Create database model for note
 class Note(db.Model):
     __tablename__ = 'Notes'
     id = db.Column(db.Integer, primary_key=True)
@@ -264,3 +265,9 @@ def get_view_note(id):
 def get_flashcards():
     study_sets = StudySet.query.all()
     return render_template('flashcards/index.html', study_sets=study_sets)
+
+@app.get('/flashcards/<int:id>')
+def get_view_study_set(id):
+    print(id)
+    study_set = StudySet.query.get_or_404(id)
+    return render_template('flashcards/view.html', study_set=study_set)
