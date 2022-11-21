@@ -260,6 +260,7 @@ def get_view_note(id):
     return render_template('notes/view.html', note=note)
 
 # flashcards
+#  FIX YOU ACTUALLY GET YOUR FLASHCARDS
 @app.get('/flashcards')
 @login_required
 def get_flashcards():
@@ -271,3 +272,15 @@ def get_view_study_set(id):
     print(id)
     study_set = StudySet.query.get_or_404(id)
     return render_template('flashcards/view.html', study_set=study_set)
+
+
+# ADD AUTHENTICATION!
+@app.patch('/api/flashcard/<int:id>')
+@login_required
+def update_single_flashcard(id):
+    flashcard = Flashcard.query.get_or_404(id)
+    flashcard_json = request.get_json()
+    flashcard.front_text = flashcard_json.get('frontText')
+    flashcard.back_text = flashcard_json.get('backText')
+    db.session.commit()
+    return "success", 200

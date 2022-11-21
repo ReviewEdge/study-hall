@@ -2,6 +2,8 @@
 
 {% block head %}
   {{ super() }}
+  <title>{{ study_set.name }}</title>
+  <script src="/static/scripts/flashcard.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -9,8 +11,16 @@
   <h2>{{ study_set.name }}</h2>
 
   {% for f in study_set.flashcards %}
-    <h4>{{ f.front_text }}</h4>
-    <p>{{ f.back_text }}</p>
+    <div class="flashcard" id="{{ f.id }}">
+      <h4 class="front" style="display: block;">{{ f.front_text }}</h4>
+      <p class="back" style="display: block;">{{ f.back_text }}</p>
+
+      <textarea class="front-editing" style="display: none;">{{ f.front_text }}</textarea>
+      <textarea class="back-editing" style="display: none;">{{ f.back_text }}</textarea>
+
+      <button class="edit-btn" style="display: inline;">Edit</button>
+      <button class="save-btn" style="display: none;">Save</button>
+    </div>
     <br />
   {% endfor %}
 </div>
