@@ -11,19 +11,19 @@
   <h2>{{ study_set.name }}</h2>
   <button><h4><a href="/api/study/{{ study_set.id }}">STUDY</a></h4></button>
   <br />
-  {% for f in study_set.flashcards %}
-    <div class="flashcard" id="{{ f.id }}">
-      <h4 class="front" style="display: block;">{{ f.front_text }}</h4>
-      <p class="back" style="display: block;">{{ f.back_text }}</p>
+  <div id="flashcards-container">
+    <div class="flashcard" id="flashcard_template" style="display: none;">
+      <h4 class="front" style="display: block;">Front Text</h4>
+      <p class="back" style="display: block;">Back Text</p>
 
-      <textarea class="front-editing" style="display: none;">{{ f.front_text }}</textarea>
-      <textarea class="back-editing" style="display: none;">{{ f.back_text }}</textarea>
+      <textarea class="front-editing" style="display: none;">Front Text</textarea>
+      <textarea class="back-editing" style="display: none;">Back Text</textarea>
 
       <button class="edit-btn" style="display: inline;">Edit</button>
       <button class="save-btn" style="display: none;">Save</button>
+      <br />
     </div>
-    <br />
-  {% endfor %}
+  </div>
 
   <button id="add-flashcard-btn">New Flashcard</button>
   <span id="studyset-id" style="display: none;">{{ study_set.id }}</span>

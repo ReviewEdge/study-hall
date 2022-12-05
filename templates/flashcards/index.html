@@ -5,14 +5,23 @@
 {% endblock %}
 
 {% block content %}
-  <h1>Your Study Sets</h1>
+  <h1>My Study Sets</h1>
   <table cellpadding="7">
       {% for s in study_sets %}
           <tr>
               <td>
-                <a href="{{ url_for('get_view_study_set', id=s.id) }}">
-                  {{ s.name }}
-                </a>
+                <h4>
+                  <a href="{{ url_for('get_view_study_set', id=s.id) }}">
+                    {{ s.name }}
+                  </a>
+                </h4>
+                <button>
+                  <a href="{{ url_for('study_studyset', id=s.id) }}">
+                    STUDY
+                  </a>
+                </button>
+                <br />
+                <br />
               </td>
           </tr>
       {% endfor %}

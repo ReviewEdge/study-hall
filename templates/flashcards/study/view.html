@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block head %}
+  {{ super() }}
+  <title>{{ study_set.name }}</title>
+{% endblock %}
+
+{% block content %}
+<div>
+  <h2><a href="/flashcards/{{  study_set.id }}">{{ study_set.name }}</a></h2>
+
+  {% if current_flashcard %}
+    <div class="flashcard" id="{{ current_flashcard.id }}">
+      <h4 class="front" style="display: block;">{{ current_flashcard.front_text }}</h4>
+      <p class="back" style="display: block;">{{ current_flashcard.back_text }}</p>
+    </div>
+    <button><a href="/api/study/{{ study_set.id }}/prev"><</a></button>
+    <button><a href="/api/study/{{ study_set.id }}/next">></a></button>
+  {% else %}
+    <h3>No cards in set.</h3>
+  {% endif %}
+</div>
+{% endblock %}

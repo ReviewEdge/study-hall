@@ -8,7 +8,7 @@ script_dir = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(script_dir)
 
 from flask import Flask, request, render_template, redirect, url_for
-from flask import flash, jsonify
+from flask import flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
@@ -94,6 +94,15 @@ class Flashcard(db.Model):
     front_text = db.Column(db.Unicode, nullable=False)
     back_text = db.Column(db.Unicode, nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
+
+    def to_json(self):
+	    return {
+			"id": self.id,
+			"setID": self.setID,
+			"timestamp": self.timestamp.isoformat(),
+			"frontText": self.front_text,
+			"backText": self.back_text,
+		}
 
 # Create database model for note
 class Note(db.Model):
@@ -260,21 +269,43 @@ def get_view_note(id):
     return render_template('notes/view.html', note=note)
 
 # flashcards
-#  FIX YOU ACTUALLY GET YOUR FLASHCARDS
+#  FIX YOU ACTUALLY GET /YOUR/ FLASHCARDS
 @app.get('/flashcards')
 @login_required
 def get_flashcards():
     study_sets = StudySet.query.all()
     return render_template('flashcards/index.html', study_sets=study_sets)
 
+
+@app.post('/api/flashcard/create/<int:id>/')
+@login_required
+def post_create_flashcard(id):
+    new_flashcard = Flashcard(
+        setID=id,
+        front_text = "Front Text",
+        back_text = "Back Text",
+        timestamp = datetime.now()
+    )
+    db.session.add(new_flashcard)
+    db.session.commit()
+    return jsonify(new_flashcard.to_json()), 201
+
+
+@app.get("/api/flashcards/<int:id>/")
+def get_studyset_flashcards(id):
+	flashcards = StudySet.query.get_or_404(id).flashcards
+	return jsonify({
+		"count": len(flashcards),
+		"flashcards": [f.to_json() for f in flashcards]
+	})
+
 @app.get('/flashcards/<int:id>')
 def get_view_study_set(id):
-    print(id)
     study_set = StudySet.query.get_or_404(id)
-    return render_template('flashcards/view.html', study_set=study_set)
+    return render_template('flashcards/view2.html', study_set=study_set)
 
 
-# ADD AUTHENTICATION!
+# not properly authenticated?
 @app.patch('/api/flashcard/<int:id>')
 @login_required
 def update_single_flashcard(id):
@@ -284,3 +315,59 @@ def update_single_flashcard(id):
     flashcard.back_text = flashcard_json.get('backText')
     db.session.commit()
     return "success", 200
+
+
+# not properly authenticated?
+@app.get('/api/flashcard/<int:id>/view')
+@login_required
+def get_single_flashcard(id):
+    flashcard = Flashcard.query.get_or_404(id)
+    return jsonify(flashcard.to_json()), 201
+
+
+@app.get('/api/study/<int:id>')
+@login_required
+def study_studyset(id):
+    try:
+        pos = session[f"pos_in_set_{id}"]
+        study_set = StudySet.query.get_or_404(id)
+        session[f"last_in_set_{id}"] = len(study_set.flashcards) - 1
+        if(session[f"last_in_set_{id}"] == -1):
+            return render_template('flashcards/study/view.html', study_set=study_set, current_flashcard=False)
+        return render_template('flashcards/study/view.html', study_set=study_set, current_flashcard=study_set.flashcards[pos])
+    except KeyError:
+        study_set = StudySet.query.get_or_404(id)
+        session[f"pos_in_set_{id}"] = 0
+        session[f"last_in_set_{id}"] = len(study_set.flashcards) - 1
+        if(session[f"last_in_set_{id}"] == -1):
+            return render_template('flashcards/study/view.html', study_set=study_set, current_flashcard=False)
+        return render_template('flashcards/study/view.html', study_set=study_set, current_flashcard=study_set.flashcards[session[f"pos_in_set_{id}"]])
+
+
+@app.get('/api/study/<int:id>/next')
+@login_required
+def study_studyset_next(id):
+    try:
+        if session[f"pos_in_set_{id}"] == session[f"last_in_set_{id}"]:
+            session[f"pos_in_set_{id}"] = 0
+        else:
+            session[f"pos_in_set_{id}"] += 1
+        return study_studyset(id)
+    except KeyError:
+        return study_studyset(id)
+
+
+@app.get('/api/study/<int:id>/prev')
+@login_required
+def study_studyset_prev(id):
+    try:
+        if session[f"pos_in_set_{id}"] == 0:
+            session[f"pos_in_set_{id}"] = session[f"last_in_set_{id}"]
+        else:
+            session[f"pos_in_set_{id}"] -= 1
+        return study_studyset(id)
+    except KeyError:
+        return study_studyset(id)
+
+
+
