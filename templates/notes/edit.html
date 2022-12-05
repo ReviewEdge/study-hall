@@ -13,7 +13,10 @@
   <input id="note-title" class="title-input" value="{{ note.title or '' }}" placeholder="Untitled" />
 
   <div class="d-flex justify-content-between">
-    <a href="{{ url_for('get_view_note', id=note.id) }}">View Note</a>
+    <a href="{{ url_for('get_view_note', id=note.id) }}">
+      <i class="fa-solid fa-book"></i>
+      View Note
+    </a>
     <p id="save-status" class="text-success">
       <i class="fa-solid fa-check"></i>
       Saved

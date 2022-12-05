@@ -19,6 +19,7 @@ from password_hasher import PasswordHasher
 from forms.account_forms import RegisterForm, LoginForm, EditAccountForm
 from forms.new_note_form import NewNoteForm
 from forms.new_studyset_form import NewStudysetForm
+from forms.share_note_form import ShareNoteForm
 
 ###############################################################################
 # Basic Configuration
@@ -74,7 +75,7 @@ class User(UserMixin, db.Model):
     @password.setter
     def password(self, pwd):
         self.password_hash = pwd_hasher.hash(pwd)
-    
+
     # add a verify_password convenience method
     def verify_password(self, pwd):
         return pwd_hasher.check(pwd, self.password_hash)
@@ -112,6 +113,7 @@ class Note(db.Model):
     ownerID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.Unicode)
     content = db.Column(db.Unicode)
+    public = db.Column(db.Boolean)
 
 with app.app_context():
     db.create_all() # this is only needed if the database doesn't already exist
@@ -252,12 +254,24 @@ def post_create_note():
 @login_required
 def get_edit_note(id):
     note = Note.query.get_or_404(id)
+
+    # require ownership of the note
+    if note.ownerID != int(current_user.get_id()):
+        flash("You are not the owner!")
+        return redirect(url_for('index'))
+
     return render_template('notes/edit.html', note=note)
 
 @app.patch('/api/notes/<int:id>')
 @login_required
 def update_note(id):
     note = Note.query.get_or_404(id)
+
+    # require ownership of the note
+    if note.ownerID != int(current_user.get_id()):
+        flash("You are not the owner!")
+        return redirect(url_for('index'))
+
     note_json = request.get_json()
     note.title = note_json.get('title')
     note.content = note_json.get('content')
@@ -267,7 +281,29 @@ def update_note(id):
 @app.get('/notes/<int:id>/view')
 def get_view_note(id):
     note = Note.query.get_or_404(id)
-    return render_template('notes/view.html', note=note)
+    form = ShareNoteForm()
+    share_link = f"{request.host_url}{url_for('get_view_note', id=note.id)[1:]}"
+
+    # require either public or ownership of the note
+    if not note.public and (current_user.is_anonymous or note.ownerID != int(current_user.get_id())):
+        flash("You are not the owner!")
+        return redirect(url_for('index'))
+
+    return render_template('notes/view.html', note=note, form=form, share_link=share_link)
+
+@app.post('/notes/<int:id>/share')
+@login_required
+def post_share_note(id):
+    note = Note.query.get_or_404(id)
+
+    # require ownership of the note
+    if note.ownerID != int(current_user.get_id()):
+        flash("You are not the owner!")
+        return redirect(url_for('index'))
+
+    note.public = not note.public
+    db.session.commit()
+    return redirect(url_for('get_view_note', id=note.id))
 
 # flashcards
 #  FIX YOU ACTUALLY GET /YOUR/ FLASHCARDS
@@ -399,6 +435,3 @@ def study_studyset_prev(id):
         return study_studyset(id)
     except KeyError:
         return study_studyset(id)
-
-
-

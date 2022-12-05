@@ -5,6 +5,33 @@
 {% endblock %}
 
 {% block content %}
-  <h1 class="mb-3">Note Title Here</h1>
-  <p>Note content here</p>
+  <h1 class="mb-1 display-4">{{ note.title or "Untitled" }}</h1>
+  <div class="d-flex justify-content-start align-items-center" style="column-gap: 10px;">
+    <a href="{{ url_for('get_edit_note', id=note.id) }}">
+      <i class="fa-solid fa-pen-to-square"></i>
+      Edit Note
+    </a>
+    <form method="POST" action="/notes/{{ note.id }}/share">
+      {{form.hidden_tag()}}
+      <button type="submit" class="btn btn-link p-0 text-decoration-none">
+        {% if note.public %}
+          <i class="fa-solid fa-lock"></i>
+          Make private
+        {% else %}
+          <i class="fa-solid fa-share"></i>
+          Share
+        {% endif %}
+      </button>
+    </form>
+  </div>
+  {% if note.public %}
+    <p>
+      <i class="fa-solid fa-link"></i>
+      {{ share_link }}
+    </p>
+  {% endif %}
+  <hr>
+  <div>
+    {{ note.content|safe }}
+  </div>
 {% endblock %}

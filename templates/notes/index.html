@@ -12,9 +12,26 @@
     {{form.submit(class="btn btn-link p-0 text-decoration-none")}}
   </form>
 
-  <div class="mt-5">
+  <div class="row">
     {% for note in notes %}
-      <p><a href="{{ url_for('get_edit_note', id=note.id) }}">{{ note.title or "Untitled" }}</a></p>
+      <div class="col-md-6">
+        <div class="card mt-3">
+          <div class="card-body">
+            <h5 class="card-title"><a href="{{ url_for('get_view_note', id=note.id) }}">{{ note.title or "Untitled" }}</a></h5>
+            <p class="card-text"><strong>{{ note.content|length }}</strong> characters</p>
+            <p class="card-text text-muted">
+              {% if note.public %}
+                <i class="fa-solid fa-eye"></i>
+                Public note
+              {% else %}
+                <i class="fa-solid fa-lock"></i>
+                Private note
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </div>
     {% endfor %}
   </div>
+
 {% endblock %}
