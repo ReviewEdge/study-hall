@@ -1,5 +1,8 @@
 window.addEventListener("DOMContentLoaded", function() {
     loadFlashcards();
+
+    const addFlashcardButton = document.getElementById("add-flashcard-btn");
+    addFlashcardButton.addEventListener("click", postFlashcard);
 })
 
 async function loadFlashcards() { 
@@ -40,9 +43,6 @@ function insertFlashcard(flashcard) {
 
     const saveBtn = fDiv.getElementsByClassName("save-btn")[0];
     saveBtn.addEventListener("click", () => { editModeOff(fDiv) });
-
-    const addFlashcardButton = document.getElementById("add-flashcard-btn");
-    addFlashcardButton.addEventListener("click", postFlashcard);
 
     container.appendChild(fDiv);
 }

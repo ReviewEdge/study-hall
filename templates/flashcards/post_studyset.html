@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+
+{% block head %}
+  {{ super() }}
+{% endblock %}
+
+{% block content %}
+<h1>New Study Set</h1>
+<form method="POST" action="/newstudyset">
+  {{form.hidden_tag()}}
+
+  <div class="mb-2">
+    {{form.name.label}}
+    {{form.name(class="form-control")}}
+  </div>
+
+  <div class="mb-2">
+    {{form.submit(class="btn btn-dark")}}
+  </div>
+</form>
+{% endblock %}

@@ -18,6 +18,7 @@ from flask_login import login_user, logout_user, current_user
 from password_hasher import PasswordHasher
 from forms.account_forms import RegisterForm, LoginForm, EditAccountForm
 from forms.new_note_form import NewNoteForm
+from forms.new_studyset_form import NewStudysetForm
 
 ###############################################################################
 # Basic Configuration
@@ -277,6 +278,35 @@ def get_flashcards():
     return render_template('flashcards/index.html', study_sets=study_sets)
 
 
+@app.get('/newstudyset')
+@login_required
+def get_new_studyset():
+    form = NewStudysetForm()
+    return render_template("/flashcards/post_studyset.html", form=form)
+
+
+@app.post('/newstudyset')
+@login_required
+def post_new_studyset():
+    form = NewStudysetForm()
+    if form.validate():
+
+        new_study_set = StudySet(
+            ownerID = current_user.get_id(),
+            name= form.name.data
+        )
+
+        db.session.add(new_study_set)
+        db.session.commit()
+        return redirect(url_for('get_flashcards'))
+
+    else: # if the form was invalid
+        # flash error messages and redirect to get registration form again
+        for field, error in form.errors.items():
+            flash(f"{field}: {error}")
+        return redirect(url_for('get_new_studyset'))
+
+
 @app.post('/api/flashcard/create/<int:id>/')
 @login_required
 def post_create_flashcard(id):
@@ -298,6 +328,7 @@ def get_studyset_flashcards(id):
 		"count": len(flashcards),
 		"flashcards": [f.to_json() for f in flashcards]
 	})
+
 
 @app.get('/flashcards/<int:id>')
 def get_view_study_set(id):

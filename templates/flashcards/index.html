@@ -6,6 +6,7 @@
 
 {% block content %}
   <h1>My Study Sets</h1>
+  <button><a href="{{ url_for('post_new_studyset') }}">New Study Set</a></button>
   <table cellpadding="7">
       {% for s in study_sets %}
           <tr>
