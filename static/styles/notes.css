@@ -15,3 +15,21 @@ p { margin: 0 }
 .cursor-pointer {
   cursor: pointer;
 }
+
+.note-content {
+  overflow-x: auto;
+}
+
+.note-content img {
+  margin-bottom: 5px;
+}
+
+.note-content table {
+  border-collapse: collapse;
+  width: 100% !important;
+}
+
+.note-content table td, .note-content table th {
+  border: 1px solid #CCCCCC;
+  padding: 5px;
+}

@@ -4,6 +4,9 @@
 
 import os
 import sys
+import time
+
+from flask.helpers import abort
 script_dir = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(script_dir)
 
@@ -21,9 +24,14 @@ from forms.new_note_form import NewNoteForm
 from forms.new_studyset_form import NewStudysetForm
 from forms.share_note_form import ShareNoteForm
 
+from werkzeug.utils import secure_filename
+
 ###############################################################################
 # Basic Configuration
 ###############################################################################
+
+UPLOAD_FOLDER = 'static/images/user_uploads'
+ALLOWED_EXTENSIONS = {'jpeg','jpg','jpe','jfi','jif','jfif','png','gif','bmp','webp'} # match Tiny MCE editor
 
 # load files
 dbfile = os.path.join(script_dir, "study_hall.sqlite3")
@@ -41,6 +49,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 app.config['SECRET_KEY'] = 'correcthorsebatterystaple'
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{dbfile}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # make current_user available on all pages without passing it in to each template every time
 @app.context_processor
@@ -113,8 +122,11 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ownerID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     title = db.Column(db.Unicode)
+    word_count = db.Column(db.Integer, nullable=False, default=0)
     content = db.Column(db.Unicode)
-    public = db.Column(db.Boolean)
+    public = db.Column(db.Boolean, nullable=False, default=False)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
 
 with app.app_context():
     db.create_all() # this is only needed if the database doesn't already exist
@@ -122,6 +134,12 @@ with app.app_context():
 ###############################################################################
 # Route Handlers
 ###############################################################################
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def split_filename(filename):
+    return filename.rsplit('.', 1)
 
 # User registration
 @app.get('/register/')
@@ -240,7 +258,7 @@ def index():
 @login_required
 def get_notes():
     form = NewNoteForm()
-    notes = load_user(current_user.get_id()).notes
+    notes = Note.query.filter_by(ownerID = current_user.get_id()).order_by(Note.updated_at.desc()).all()
     return render_template('notes/index.html', form=form, notes=notes)
 
 @app.post('/notes/create')
@@ -278,7 +296,9 @@ def update_note(id):
 
     note_json = request.get_json()
     note.title = note_json.get('title')
+    note.word_count = note_json.get('wordCount')
     note.content = note_json.get('content')
+    note.updated_at = datetime.now()
     db.session.commit()
     return "success", 200
 
@@ -310,6 +330,7 @@ def post_share_note(id):
         return redirect(url_for('index'))
 
     note.public = not note.public
+    note.updated_at = datetime.now()
     db.session.commit()
 
     if form.page.data == "view":
@@ -331,6 +352,26 @@ def delete_note(id):
     db.session.commit()
     flash('Note has been deleted')
     return "success", 200
+
+@app.post('/api/upload_file')
+@login_required
+def upload_file():
+    file = request.files.get('file')
+    if file and allowed_file(file.filename):
+        # validate and generate path
+        filename = secure_filename(file.filename)
+        split = split_filename(filename)
+        filename = secure_filename(f'{split[0].lower()}-{time.time()}.{split[1].lower()}')
+
+        img_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+
+        # save image
+        file.save(img_path)
+
+        # return image
+        return jsonify({"location": filename})
+
+    return "failure", 404
 
 # flashcards
 @app.get('/flashcards')

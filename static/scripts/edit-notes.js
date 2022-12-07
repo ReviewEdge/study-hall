@@ -10,6 +10,9 @@
       autoresize_bottom_margin: 50,
       autoresize_overflow_padding: 50,
       content_css: 'default,/static/styles/notes.css',
+      automatic_uploads: true,
+      images_upload_base_path: "/static/images/user_uploads",
+      images_upload_url: '/api/upload_file',
       setup: function(editor) {
         editor.on('Paste Change input Undo Redo', function(e) {
           saveNote()
@@ -35,7 +38,12 @@
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({id: noteID, title: noteTitle.value, content: tinymce.activeEditor.getContent()}),
+        body: JSON.stringify({
+          id: noteID,
+          title: noteTitle.value,
+          wordCount: tinymce.activeEditor.plugins.wordcount.body.getWordCount(),
+          content: tinymce.activeEditor.getContent()
+        }),
       }).then(() => {
           saveStatus.innerHTML = '<i class="fa-solid fa-check"></i> Saved'
           saveStatus.classList.add("text-success")

@@ -23,7 +23,14 @@
 
   const copyLink = () => {
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(copyLinkP.innerText);
+      const text = copyLinkP.innerText
+      navigator.clipboard.writeText(text);
+      copyLinkP.innerHTML = "<i class='fa-solid fa-check'></i> Copied!"
+      copyLinkP.classList.add("text-success")
+      setTimeout(() => {
+        copyLinkP.innerText = text
+        copyLinkP.classList.remove("text-success")
+      }, 2000)
     }
   }
 

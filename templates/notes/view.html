@@ -39,8 +39,22 @@
       {{ share_link }}
     </p>
   {% endif %}
+
+  <div class="d-flex" style="column-gap: 10px;">
+    <p class="text-muted">
+      {% if note.public %}
+        <i class="fa-solid fa-eye"></i>
+        Public note
+      {% else %}
+        <i class="fa-solid fa-lock"></i>
+        Private note
+      {% endif %}
+    </p>
+    <p class=""><strong>{{ note.word_count }}</strong> words</p>
+  </div> 
+
   <hr>
-  <div>
+  <div class="note-content">
     {% if note.content == None %}
       <p class="text-muted">Empty note</p>
     {% else %}

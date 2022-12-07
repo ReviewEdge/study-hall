@@ -41,6 +41,16 @@
           {{ share_link }}
         </p>
       {% endif %}
+
+      <p class="text-muted">
+        {% if note.public %}
+          <i class="fa-solid fa-eye"></i>
+          Public note
+        {% else %}
+          <i class="fa-solid fa-lock"></i>
+          Private note
+        {% endif %}
+      </p>
     </div>
     <p id="save-status" class="text-success">
       <i class="fa-solid fa-check"></i>
