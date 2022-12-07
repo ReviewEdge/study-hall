@@ -254,13 +254,16 @@ def post_create_note():
 @login_required
 def get_edit_note(id):
     note = Note.query.get_or_404(id)
+    form = ShareNoteForm()
+    form.page.data = "edit"
+    share_link = f"{request.host_url}{url_for('get_view_note', id=note.id)[1:]}"
 
     # require ownership of the note
     if note.ownerID != int(current_user.get_id()):
         flash("You are not the owner!")
         return redirect(url_for('index'))
 
-    return render_template('notes/edit.html', note=note)
+    return render_template('notes/edit.html', note=note, form=form, share_link=share_link)
 
 @app.patch('/api/notes/<int:id>')
 @login_required
@@ -282,6 +285,7 @@ def update_note(id):
 def get_view_note(id):
     note = Note.query.get_or_404(id)
     form = ShareNoteForm()
+    form.page.data = "view"
     share_link = f"{request.host_url}{url_for('get_view_note', id=note.id)[1:]}"
 
     # require either public or ownership of the note
@@ -289,12 +293,15 @@ def get_view_note(id):
         flash("You are not the owner!")
         return redirect(url_for('index'))
 
-    return render_template('notes/view.html', note=note, form=form, share_link=share_link)
+    is_owner = current_user.is_authenticated and note.ownerID == int(current_user.get_id())
+
+    return render_template('notes/view.html', note=note, form=form, share_link=share_link, is_owner=is_owner)
 
 @app.post('/notes/<int:id>/share')
 @login_required
 def post_share_note(id):
     note = Note.query.get_or_404(id)
+    form = ShareNoteForm()
 
     # require ownership of the note
     if note.ownerID != int(current_user.get_id()):
@@ -303,7 +310,26 @@ def post_share_note(id):
 
     note.public = not note.public
     db.session.commit()
-    return redirect(url_for('get_view_note', id=note.id))
+
+    if form.page.data == "view":
+        return redirect(url_for('get_view_note', id=note.id))
+    else:
+        return redirect(url_for('get_edit_note', id=note.id))
+
+@app.delete('/api/notes/<int:id>')
+@login_required
+def delete_note(id):
+    note = Note.query.get_or_404(id)
+
+    # require ownership of the note
+    if note.ownerID != int(current_user.get_id()):
+        flash("You are not the owner!")
+        return "not authorized", 403
+
+    db.session.delete(note)
+    db.session.commit()
+    flash('Note has been deleted')
+    return "success", 200
 
 # flashcards
 #  FIX YOU ACTUALLY GET /YOUR/ FLASHCARDS

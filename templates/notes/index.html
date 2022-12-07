@@ -2,6 +2,7 @@
 
 {% block head %}
   {{ super() }}
+  <link rel="stylesheet" href="/static/styles/notes.css">
 {% endblock %}
 
 {% block content %}
@@ -9,16 +10,19 @@
 
   <form method="POST" action="/notes/create">
     {{form.hidden_tag()}}
-    {{form.submit(class="btn btn-link p-0 text-decoration-none")}}
+    <button type="submit" class="btn btn-link p-0 text-decoration-none">
+      <i class="fa-solid fa-plus"></i>
+      New Note
+    </button>
   </form>
 
   <div class="row">
     {% for note in notes %}
-      <div class="col-md-6">
+      <div class="col-md-6 col-lg-4">
         <div class="card mt-3">
           <div class="card-body">
             <h5 class="card-title"><a href="{{ url_for('get_view_note', id=note.id) }}">{{ note.title or "Untitled" }}</a></h5>
-            <p class="card-text"><strong>{{ note.content|length }}</strong> characters</p>
+            <p class="card-text"><strong>{{ (note.content or [])|length }}</strong> characters</p>
             <p class="card-text text-muted">
               {% if note.public %}
                 <i class="fa-solid fa-eye"></i>

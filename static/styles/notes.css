@@ -2,7 +2,7 @@
   border-top: none;
   border-left: none;
   border-right: none;
-  margin-bottom: 5px;
+  /* margin-bottom: 5px; */
   outline: none;
   border: none;
   transition: border 300ms;
@@ -11,3 +11,7 @@
 }
 
 p { margin: 0 }
+
+.cursor-pointer {
+  cursor: pointer;
+}

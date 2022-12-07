@@ -2,36 +2,49 @@
 
 {% block head %}
   {{ super() }}
+  <script src="/static/scripts/view-notes.js"></script>
+  <link rel="stylesheet" href="/static/styles/notes.css">
 {% endblock %}
 
 {% block content %}
-  <h1 class="mb-1 display-4">{{ note.title or "Untitled" }}</h1>
-  <div class="d-flex justify-content-start align-items-center" style="column-gap: 10px;">
-    <a href="{{ url_for('get_edit_note', id=note.id) }}">
-      <i class="fa-solid fa-pen-to-square"></i>
-      Edit Note
-    </a>
-    <form method="POST" action="/notes/{{ note.id }}/share">
-      {{form.hidden_tag()}}
-      <button type="submit" class="btn btn-link p-0 text-decoration-none">
-        {% if note.public %}
-          <i class="fa-solid fa-lock"></i>
-          Make private
-        {% else %}
-          <i class="fa-solid fa-share"></i>
-          Share
-        {% endif %}
-      </button>
-    </form>
+  <div class="d-flex justify-content-between align-items-center" style="column-gap: 10px;">
+    <h1 class="mb-1 display-4">
+      {{ note.title or "Untitled" }}
+    </h1>
+    {% if is_owner %}
+      <div class="d-flex d-flex-column align-items-center justify-content-end" style="column-gap: 10px;">
+        <form method="POST" action="/notes/{{ note.id }}/share">
+          {{form.hidden_tag()}}
+          <button type="submit" class="btn btn-link p-0 text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="bottom" title="{{'Make private' if note.public else 'Share note' }}">
+            {% if note.public %}
+              <i class="fa-solid fa-lock fa-2x"></i>
+            {% else %}
+              <i class="fa-solid fa-share fa-2x"></i>
+            {% endif %}
+          </button>
+        </form>
+        <a href="{{ url_for('get_edit_note', id=note.id) }}" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Edit note">
+          <i class="fa-solid fa-pen-to-square fa-2x"></i>
+        </a>
+        <button id="delete-note" data-note-id="{{ note.id }}" class="btn btn-link p-0 text-decoration-none" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Delete note">
+          <i class="fa-solid fa-trash-alt fa-2x"></i>
+        </a>
+      </div>
+    {% endif %}
   </div>
+
   {% if note.public %}
-    <p>
+    <p class="d-inline-block cursor-pointer" id="copy-link" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Copy link">
       <i class="fa-solid fa-link"></i>
       {{ share_link }}
     </p>
   {% endif %}
   <hr>
   <div>
-    {{ note.content|safe }}
+    {% if note.content == None %}
+      <p class="text-muted">Empty note</p>
+    {% else %}
+      {{ note.content|safe }}
+    {% endif %}
   </div>
 {% endblock %}
