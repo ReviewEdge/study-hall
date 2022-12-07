@@ -67,6 +67,7 @@ class User(UserMixin, db.Model):
     email = db.Column(db.Unicode, nullable=False)
     password_hash = db.Column(db.LargeBinary) # hash is a binary attribute
     notes = db.relationship('Note', backref='owner')
+    study_sets = db.relationship('StudySet', backref='owner')
 
     # make a write-only password property that just updates the stored hash
     @property
@@ -332,11 +333,10 @@ def delete_note(id):
     return "success", 200
 
 # flashcards
-#  FIX YOU ACTUALLY GET /YOUR/ FLASHCARDS
 @app.get('/flashcards')
 @login_required
 def get_flashcards():
-    study_sets = StudySet.query.all()
+    study_sets = load_user(current_user.get_id()).study_sets
     return render_template('flashcards/index.html', study_sets=study_sets)
 
 
@@ -352,7 +352,6 @@ def get_new_studyset():
 def post_new_studyset():
     form = NewStudysetForm()
     if form.validate():
-
         new_study_set = StudySet(
             ownerID = current_user.get_id(),
             name= form.name.data
@@ -372,6 +371,13 @@ def post_new_studyset():
 @app.post('/api/flashcard/create/<int:id>/')
 @login_required
 def post_create_flashcard(id):
+    owner = StudySet.query.get_or_404(id).ownerID
+
+    # require ownership of the study set
+    if owner != int(current_user.get_id()):
+        flash("You are not the owner!")
+        return redirect(url_for('get_flashcards'))
+
     new_flashcard = Flashcard(
         setID=id,
         front_text = "Front Text",
@@ -385,8 +391,16 @@ def post_create_flashcard(id):
 
 @app.get("/api/flashcards/<int:id>/")
 def get_studyset_flashcards(id):
-	flashcards = StudySet.query.get_or_404(id).flashcards
-	return jsonify({
+    study_set = StudySet.query.get_or_404(id)
+
+    # require ownership of the study set
+    if study_set.ownerID != int(current_user.get_id()):
+        flash("You are not the owner!")
+        return redirect(url_for('get_flashcards'))
+
+    flashcards = study_set.flashcards
+
+    return jsonify({
 		"count": len(flashcards),
 		"flashcards": [f.to_json() for f in flashcards]
 	})
@@ -395,14 +409,28 @@ def get_studyset_flashcards(id):
 @app.get('/flashcards/<int:id>')
 def get_view_study_set(id):
     study_set = StudySet.query.get_or_404(id)
+
+    # require ownership of the study set
+    if study_set.ownerID != int(current_user.get_id()):
+        flash("You are not the owner!")
+        return redirect(url_for('get_flashcards'))
+
     return render_template('flashcards/view2.html', study_set=study_set)
 
 
-# not properly authenticated?
 @app.patch('/api/flashcard/<int:id>')
 @login_required
 def update_single_flashcard(id):
     flashcard = Flashcard.query.get_or_404(id)
+
+    # would be better to have ownerID in each flashcard model
+    owner = StudySet.query.get_or_404(flashcard.setID).ownerID
+
+    # require ownership of the study set
+    if owner != int(current_user.get_id()):
+        flash("You are not the owner!")
+        return redirect(url_for('get_flashcards'))
+
     flashcard_json = request.get_json()
     flashcard.front_text = flashcard_json.get('frontText')
     flashcard.back_text = flashcard_json.get('backText')
@@ -410,11 +438,19 @@ def update_single_flashcard(id):
     return "success", 200
 
 
-# not properly authenticated?
 @app.get('/api/flashcard/<int:id>/view')
 @login_required
 def get_single_flashcard(id):
     flashcard = Flashcard.query.get_or_404(id)
+
+    # would be better to have ownerID in each flashcard model
+    owner = StudySet.query.get_or_404(flashcard.setID).ownerID
+
+    # require ownership of the study set
+    if owner != int(current_user.get_id()):
+        flash("You are not the owner!")
+        return redirect(url_for('get_flashcards'))
+
     return jsonify(flashcard.to_json()), 201
 
 
@@ -424,12 +460,24 @@ def study_studyset(id):
     try:
         pos = session[f"pos_in_set_{id}"]
         study_set = StudySet.query.get_or_404(id)
+
+        # require ownership of the study set
+        if study_set.ownerID != int(current_user.get_id()):
+            flash("You are not the owner!")
+            return redirect(url_for('get_flashcards'))
+
         session[f"last_in_set_{id}"] = len(study_set.flashcards) - 1
         if(session[f"last_in_set_{id}"] == -1):
             return render_template('flashcards/study/view.html', study_set=study_set, current_flashcard=False)
         return render_template('flashcards/study/view.html', study_set=study_set, current_flashcard=study_set.flashcards[pos])
     except KeyError:
         study_set = StudySet.query.get_or_404(id)
+
+        # require ownership of the study set
+        if study_set.ownerID != int(current_user.get_id()):
+            flash("You are not the owner!")
+            return redirect(url_for('get_flashcards'))
+
         session[f"pos_in_set_{id}"] = 0
         session[f"last_in_set_{id}"] = len(study_set.flashcards) - 1
         if(session[f"last_in_set_{id}"] == -1):
