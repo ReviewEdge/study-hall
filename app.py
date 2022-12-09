@@ -14,6 +14,7 @@ from flask import Flask, request, render_template, redirect, url_for
 from flask import flash, jsonify, session
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from sqlalchemy.sql import func
 
 # user authentication
 from flask_login import UserMixin, LoginManager, login_required
@@ -125,8 +126,8 @@ class Note(db.Model):
     word_count = db.Column(db.Integer, nullable=False, default=0)
     content = db.Column(db.Unicode)
     public = db.Column(db.Boolean, nullable=False, default=False)
-    created_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
-    updated_at = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
 with app.app_context():
     db.create_all() # this is only needed if the database doesn't already exist
@@ -298,7 +299,7 @@ def update_note(id):
     note.title = note_json.get('title')
     note.word_count = note_json.get('wordCount')
     note.content = note_json.get('content')
-    note.updated_at = datetime.now()
+    # note.updated_at = datetime.now()
     db.session.commit()
     return "success", 200
 
@@ -330,7 +331,7 @@ def post_share_note(id):
         return redirect(url_for('index'))
 
     note.public = not note.public
-    note.updated_at = datetime.now()
+    # note.updated_at = datetime.now()
     db.session.commit()
 
     if form.page.data == "view":
