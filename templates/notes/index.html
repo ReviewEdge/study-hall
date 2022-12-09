@@ -3,6 +3,7 @@
 {% block head %}
   {{ super() }}
   <link rel="stylesheet" href="/static/styles/notes.css">
+  <script src="/static/scripts/index-notes.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -10,15 +11,28 @@
 
   <form method="POST" action="/notes/create">
     {{form.hidden_tag()}}
-    <button type="submit" class="btn btn-link p-0 text-decoration-none">
+    <button type="submit" class="btn btn-link p-0 text-decoration-none mb-3">
       <i class="fa-solid fa-plus"></i>
       New Note
     </button>
   </form>
 
-  <div class="row">
+  {% if notes|length > 0 %}
+    <div class="d-flex" style="column-gap: 10px;">
+      <select class="form-select w-auto" id="sort-by">
+        <option selected value="updated">Sort by Updated</option>
+        <option value="created">Sort by Created</option>
+      </select>
+      <select class="form-select w-auto" id="sort-dir" >
+        <option value="asc">Ascending</option>
+        <option selected value="desc">Descending</option>
+      </select>
+    </div>
+  {% endif %}
+
+  <div class="row" id="notes">
     {% for note in notes %}
-      <div class="col-md-6 col-lg-4">
+      <div class="col-md-6 col-lg-4" data-created-at="{{note.created_at}}" data-updated-at="{{note.updated_at}}">
         <div class="card mt-3">
           <div class="card-body">
             <h5 class="card-title"><a href="{{ url_for('get_view_note', id=note.id) }}">{{ note.title or "Untitled" }}</a></h5>
