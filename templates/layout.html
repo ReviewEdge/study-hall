@@ -16,12 +16,22 @@
 
   <!-- custom styles -->
   <link rel="stylesheet" href="/static/styles/main.css">
+
+  <!-- timer operation -->
+  <script src="/static/scripts/timer.js"></script>
+  <link rel="stylesheet" href="/static/styles/timer.css">
   {% endblock %}
 </head>
 <body>
   <nav class="navbar navbar-dark bg-dark navbar-expand-md">
     <div class="container">
       <a class="navbar-brand" href="{{ url_for('index') }}"><img src="/static/images/Logo-sm.png" height = 50> Study Hall</a>
+      <div class="navbar-brand" id="timer-div">
+        <span id="timer">00:00</span>
+        <br>
+        <button class="btn btn-success btn-sm" id="timer-toggle">Start</button>
+        <button class="btn btn-info btn-sm" id="timer-skip">Skip</button>
+      </div>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>

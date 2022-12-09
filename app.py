@@ -550,3 +550,59 @@ def study_studyset_prev(id):
         return study_studyset(id)
     except KeyError:
         return study_studyset(id)
+
+###############################################################################
+# Timer Data Handling
+###############################################################################
+
+#this is used by the timer's javascript whenever a 
+#new page is loaded to query the current state of the timer
+@app.get('/timer/status/')
+def status():
+    #send following data
+    #{
+    #   "a": active? (true=running, false=paused)
+    #   "w": working? (true=working, false=break)
+    #   "s": start time (only sent if running)
+    #   "t": time left in seconds (if start time is included, then remove time passed since starting)
+    #   "c": cycle number (how many work sessions have been completed)
+    #}
+    #added "t-" to the start of the variable name so it won't accidentially mess someone else's session variable
+    if('t-time-left' not in session):
+        session['t-active'] = False
+        session['t-working'] = True
+        session['t-start'] = "None"
+        session['t-time-left'] = 1500
+        session['t-cycle'] = 0
+    
+    value = {
+        "a": session['t-active'],
+        "w": session['t-working'],
+        "s": session['t-start'],
+        "t": session['t-time-left'],
+        "c": session['t-cycle']
+    }
+    return jsonify(value)
+
+
+#the javascript uses this to log the fact that it has stopped the timer,
+#as well as what state the timer is in (how much time is left)
+#this is also called when the timer finishes to set up the next one
+@app.post('/timer/pause/')
+def pause():
+    data = request.get_json()
+    #print(f"w={data.get('w')} t={data.get('t')}")
+    session['t-working'] = data.get('w')
+    session['t-time-left'] = data.get('t')
+    session['t-active'] = False
+    session['t-cycle'] = data.get('c', session['t-cycle'])
+    return "", 200
+
+@app.post('/timer/start/')
+def start():
+    data = request.get_json()
+    #print(f"s={data.get('s')} t={data.get('t')}")
+    session['t-start'] = data.get('s')
+    session['t-time-left'] = data.get('t')
+    session['t-active'] = True
+    return "", 200

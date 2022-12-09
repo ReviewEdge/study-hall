@@ -1,0 +1,15 @@
+#timer-div{
+    color: white;
+    border-radius: .5em;
+    padding: 0em .5em .4em .5em;
+    text-align: center;
+}
+.work{
+    background-color: crimson;
+}
+.break{
+    background-color:cornflowerblue;
+}
+.unset{
+    background-color: darkgray;
+}
