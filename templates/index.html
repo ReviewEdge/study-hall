@@ -7,4 +7,17 @@
 {% block content %}
   <h1>Study Hall</h1>
   <p>A study suite web app with tools for students</p>
+  {% if current_user.is_authenticated %}
+  <hr>
+  <h4>Recently Viewed for {{ current_user.name }}</h4>
+  {% for s in current_user.study_sets %}
+  <button>
+    <p>
+      <a href="{{ url_for('get_view_study_set', id=s.id) }}">
+        {{ s.name }}
+      </a>
+    </p>
+  </button>
+  {% endfor %}
+  {% endif %}
 {% endblock %}
