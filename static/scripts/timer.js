@@ -75,7 +75,6 @@ async function toggle(){
         active = false;
         toggleBtn.innerText = "Start";
         toggleBtn.className = "btn btn-success btn-sm";
-        timeLeft++;//the timer decrements before repeating in the code, reverse that
         fetch("/timer/pause/", {
             "method":"POST",
             "headers": {"Content-Type": "application/json"},
@@ -151,8 +150,8 @@ function timerLoop(){
         num_loops_active--;
         return;
     }
-    timer.innerText = timerText(timeLeft);
     if(active){
+        timer.innerText = timerText(timeLeft);
         timeLeft--;
         if(timeLeft <= 0){
             setTimeout(changeState, 1000);

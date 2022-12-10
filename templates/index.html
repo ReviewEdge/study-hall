@@ -5,19 +5,66 @@
 {% endblock %}
 
 {% block content %}
-  <h1>Study Hall</h1>
-  <p>A study suite web app with tools for students</p>
   {% if current_user.is_authenticated %}
-  <hr>
-  <h4>Recently Viewed for {{ current_user.name }}</h4>
-  {% for s in current_user.study_sets %}
-  <button>
-    <p>
-      <a href="{{ url_for('get_view_study_set', id=s.id) }}">
-        {{ s.name }}
-      </a>
-    </p>
-  </button>
-  {% endfor %}
+    <h1>Welcome, {{ current_user.name }}</h1>
+    <hr>
+
+    <h4>Recently Viewed Study Sets ({{ recent_sets|length }})</h4>
+    <div class="mb-3">
+      <div class="row" id="study-sets">
+        {% for set in recent_sets %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title mb-0">
+                  <a href="{{ url_for('get_view_study_set', id=set.id) }}">{{ set.name }}</a>
+                </h5>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if recent_sets|length == 0 %}
+        <p class="mb-0 text-muted">No recent sets</p>
+      {% endif %}
+    </div>
+
+    <h4>Recently Viewed Notes ({{ recent_notes|length }})</h4>
+    <div class="mb-3">
+      <div class="row" id="notes">
+        {% for note in recent_notes %}
+          <div class="col-md-6 col-lg-4">
+            <div class="card mb-3">
+              <div class="card-body">
+                <h5 class="card-title"><a href="{{ url_for('get_view_note', id=note.id) }}">{{ note.title or "Untitled" }}</a></h5>
+                <p class="card-text"><strong>{{ note.word_count }}</strong> words</p>
+                <p class="card-text text-muted">
+                  {% if note.public %}
+                    <i class="fa-solid fa-eye"></i>
+                    Public note
+                  {% else %}
+                    <i class="fa-solid fa-lock"></i>
+                    Private note
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if recent_notes|length == 0 %}
+        <p class="mb-0 text-muted">No recent notes</p>
+      {% endif %}
+    </div>
+  {% else %}
+    <h1>Study Hall</h1>
+    <p>A study suite web app with tools for students</p>
+
+    <div class="mt-2">
+      <a href="{{ url_for('get_login') }}">Log In</a> or <a href="{{ url_for('get_register') }}">Sign Up</a> to begin
+    </div>
+
   {% endif %}
 {% endblock %}

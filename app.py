@@ -98,6 +98,8 @@ class StudySet(db.Model):
     ownerID = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     name = db.Column(db.Unicode, nullable=False)
     flashcards = db.relationship('Flashcard', backref='study_set')
+    created_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now())
+    updated_at = db.Column(db.DateTime(timezone=True), nullable=False, server_default=func.now(), onupdate=func.now())
 
 # Create database model for flashcards
 class Flashcard(db.Model):
@@ -252,7 +254,9 @@ def delete_account():
 # home page
 @app.get('/')
 def index():
-    return render_template('index.html')
+    recent_notes = Note.query.filter_by(ownerID = current_user.get_id()).order_by(Note.updated_at.desc()).limit(3).all()
+    recent_sets = StudySet.query.filter_by(ownerID = current_user.get_id()).order_by(StudySet.updated_at.desc()).limit(3).all()
+    return render_template('index.html', recent_notes=recent_notes, recent_sets=recent_sets)
 
 # notes
 @app.get('/notes')
