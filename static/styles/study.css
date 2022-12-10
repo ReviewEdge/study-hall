@@ -1,0 +1,25 @@
+.flashcard {
+    transform-style: preserve-3d;
+    transition: all 0.8s ease;
+    width: 100%;
+    height: 100%;
+}
+
+#front {
+    backface-visibility: hidden;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+#back {
+    backface-visibility: hidden;
+    transform: rotateY(180deg);
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.flipCard {
+    transform: rotateY(180deg);
+}

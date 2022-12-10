@@ -3,17 +3,24 @@
 {% block head %}
   {{ super() }}
   <title>{{ study_set.name }}</title>
+  <script src="/static/scripts/study.js"></script>
+  <link rel="stylesheet" href="/static/styles/study.css">
 {% endblock %}
 
 {% block content %}
 <div>
   <h2><a href="/flashcards/{{  study_set.id }}">{{ study_set.name }}</a></h2>
-
   {% if current_flashcard %}
-    <div class="flashcard" id="{{ current_flashcard.id }}">
-      <h4 class="front" style="display: block;">{{ current_flashcard.front_text }}</h4>
-      <p class="back" style="display: block;">{{ current_flashcard.back_text }}</p>
+    <div class="flashcard border rounded p-4" id="{{ current_flashcard.id }}">
+      <div id="front">
+        <h4>{{ current_flashcard.front_text }}</h4>
+      </div>
+      <div id="back">
+        <h4>{{ current_flashcard.back_text }}</h4>
+      </div>
     </div>
+    <br />
+    <br />
     <button><a href="/api/study/{{ study_set.id }}/prev"><</a></button>
     <button><a href="/api/study/{{ study_set.id }}/next">></a></button>
   {% else %}

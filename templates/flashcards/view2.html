@@ -9,23 +9,29 @@
 {% block content %}
 <div>
   <h2>{{ study_set.name }}</h2>
-  <button><h4><a href="/api/study/{{ study_set.id }}">STUDY</a></h4></button>
+  <button class="rounded my-2"><h4><a href="/api/study/{{ study_set.id }}">STUDY</a></h4></button>
+  
+  <button id="add-flashcard-btn" type="submit" class="btn btn-link pt-3 text-decoration-none mb-3">
+    <i class="fa-solid fa-plus"></i>
+    New Flashcard
+  </button>
+
   <br />
   <div id="flashcards-container">
-    <div class="flashcard" id="flashcard_template" style="display: none;">
-      <h4 class="front" style="display: block;">Front Text</h4>
-      <p class="back" style="display: block;">Back Text</p>
+    <div class="flashcard border rounded p-2 mt-3 mb-3 w-50" id="flashcard_template" style="display: none;">      
+      <h4 class="front" style="display: inline;">Front Text</h4>
+      <hr class="hr"/>
+      <h4 class="back" style="display: block;">Back Text</h4>
 
       <textarea class="front-editing" style="display: none;">Front Text</textarea>
+      <hr class="hr-editing" style="display: none;"/>
       <textarea class="back-editing" style="display: none;">Back Text</textarea>
 
-      <button class="edit-btn" style="display: inline;">Edit</button>
-      <button class="save-btn" style="display: none;">Save</button>
+      <a class="edit-btn position-relative float-end" style="display: inline;"><i class="fa-solid fa-pen-to-square fa"></i></a>
+      <button class="save-btn rounded mt-2" style="display: none;">Save</button>
       <br />
     </div>
   </div>
-
-  <button id="add-flashcard-btn">New Flashcard</button>
   <span id="studyset-id" style="display: none;">{{ study_set.id }}</span>
 </div>
 {% endblock %}

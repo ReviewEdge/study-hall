@@ -67,12 +67,14 @@ function makeEditable() {
 }
 
 function editModeOn(flashcard) {
-    flashcard.getElementsByClassName("front")[0].style.display = "none"
-    flashcard.getElementsByClassName("back")[0].style.display = "none"
+    flashcard.getElementsByClassName("front")[0].style.display = "none";
+    flashcard.getElementsByClassName("back")[0].style.display = "none";
     flashcard.getElementsByClassName("edit-btn")[0].style.display = "none";
+    flashcard.getElementsByClassName("hr")[0].style.display = "none";
 
     flashcard.getElementsByClassName("front-editing")[0].style.display = "block";
     flashcard.getElementsByClassName("back-editing")[0].style.display = "block";
+    flashcard.getElementsByClassName("hr-editing")[0].style.display = "block";
     flashcard.getElementsByClassName("save-btn")[0].style.display = "inline";
 }
 
@@ -96,13 +98,15 @@ function editModeOff(flashcard) {
     flashcard.getElementsByClassName("front")[0].innerText = newFrontText
     flashcard.getElementsByClassName("back")[0].innerText = newBackText
     
-    flashcard.getElementsByClassName("front")[0].style.display = "block"
-    flashcard.getElementsByClassName("back")[0].style.display = "block"
+    flashcard.getElementsByClassName("front")[0].style.display = "block";
+    flashcard.getElementsByClassName("back")[0].style.display = "block";
     flashcard.getElementsByClassName("edit-btn")[0].style.display = "inline";
+    flashcard.getElementsByClassName("hr")[0].style.display = "block";
 
     flashcard.getElementsByClassName("front-editing")[0].style.display = "none";
     flashcard.getElementsByClassName("back-editing")[0].style.display = "none";
     flashcard.getElementsByClassName("save-btn")[0].style.display = "none";
+    flashcard.getElementsByClassName("hr-editing")[0].style.display = "none";
 }
 
 /**

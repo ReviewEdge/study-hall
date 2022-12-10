@@ -401,7 +401,7 @@ def post_new_studyset():
 
         db.session.add(new_study_set)
         db.session.commit()
-        return redirect(url_for('get_flashcards'))
+        return redirect(url_for('get_view_study_set', id=new_study_set.id))
 
     else: # if the form was invalid
         # flash error messages and redirect to get registration form again
