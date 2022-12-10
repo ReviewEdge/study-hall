@@ -20,8 +20,9 @@
   {% if notes|length > 0 %}
     <div class="d-flex" style="column-gap: 10px;">
       <select class="form-select w-auto" id="sort-by">
-        <option selected value="updated">Sort by Updated</option>
-        <option value="created">Sort by Created</option>
+        <option selected value="updatedAt">Sort by Updated At</option>
+        <option value="createdAt">Sort by Created At</option>
+        <option value="title">Sort by Title</option>
       </select>
       <select class="form-select w-auto" id="sort-dir" >
         <option value="asc">Ascending</option>
@@ -32,7 +33,7 @@
 
   <div class="row" id="notes">
     {% for note in notes %}
-      <div class="col-md-6 col-lg-4" data-created-at="{{note.created_at}}" data-updated-at="{{note.updated_at}}">
+      <div class="col-md-6 col-lg-4" data-created-at="{{note.created_at}}" data-updated-at="{{note.updated_at}}" data-title="{{note.title or "Untitled"}}">
         <div class="card mt-3">
           <div class="card-body">
             <h5 class="card-title"><a href="{{ url_for('get_view_note', id=note.id) }}">{{ note.title or "Untitled" }}</a></h5>

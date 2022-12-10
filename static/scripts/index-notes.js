@@ -21,10 +21,16 @@
     const sortBy = sortByEl.value
     const sortDir = sortDirEl.value
 
-    const sortByAttr = sortBy === "updated" ? "updatedAt" : "createdAt"
     notes = notes.sort((a,b) => {
-      const aDate = new Date(a.dataset[sortByAttr])
-      const bDate = new Date(b.dataset[sortByAttr])
+      if (sortBy === "title") {
+        if (sortDir === "asc") {
+          return a.dataset[sortBy].localeCompare(b.dataset[sortBy], undefined, {sensitivity: 'base'})
+        } else {
+          return b.dataset[sortBy].localeCompare(a.dataset[sortBy], undefined, {sensitivity: 'base'})
+        }
+      }
+      const aDate = new Date(a.dataset[sortBy])
+      const bDate = new Date(b.dataset[sortBy])
       return sortDir === "asc" ? aDate - bDate : bDate - aDate
     })
 
