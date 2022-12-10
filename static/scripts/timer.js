@@ -4,6 +4,7 @@ let toggleBtn;
 let timeLeft; //time left on the timer
 let cycle; //number of work stints finished
 let is_working; //whether this timer is a work timer or break timer
+let num_loops_active = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
     //get elements
@@ -57,6 +58,7 @@ async function loadTimer(actionData){
         }
         else{
             //otherwise resume the timer
+            num_loops_active++;
             timerLoop();
         }
     }else{
@@ -96,6 +98,7 @@ async function toggle(){
         active = true;
         toggleBtn.innerText = "Pause";
         toggleBtn.className = "btn btn-warning btn-sm";
+        num_loops_active++;
         timerLoop();
     }
 }
@@ -144,6 +147,10 @@ async function changeState(){
  * this function can be stopped by setting {active} to false or the timer running out
  */
 function timerLoop(){
+    if(num_loops_active > 1){
+        num_loops_active--;
+        return;
+    }
     timer.innerText = timerText(timeLeft);
     if(active){
         timeLeft--;
@@ -152,7 +159,9 @@ function timerLoop(){
             return;
         }
 		setTimeout(timerLoop, 1000);
-	}
+	}else{
+        num_loops_active--;
+    }
 }
 /**
  * 
