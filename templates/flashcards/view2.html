@@ -9,27 +9,40 @@
 {% block content %}
 <div>
   <h2>{{ study_set.name }}</h2>
-  <button class="rounded my-2"><h4><a href="/api/study/{{ study_set.id }}">STUDY</a></h4></button>
-  
-  <button id="add-flashcard-btn" type="submit" class="btn btn-link pt-3 text-decoration-none mb-3">
+  <div class="">
+    <a href="/api/study/{{ study_set.id }}" class="text-decoration-none mb-0">
+      <i class="fa-solid fa-book-open"></i>
+      Study
+    </a>
+  </div>
+  <button id="add-flashcard-btn" type="submit" class="btn btn-link p-0 text-decoration-none mb-0">
     <i class="fa-solid fa-plus"></i>
     New Flashcard
   </button>
+  
+  <div id="flashcards-container" class="mt-3">
+    <div class="card mb-3" id="flashcard_template" style="display: none;">
+      <div class="card-body">
+        <h4 class="front" style="display: inline;">Front Text</h4>
+        <hr class="hr"/>
+        <h4 class="back" style="display: block;">Back Text</h4>
 
-  <br />
-  <div id="flashcards-container">
-    <div class="flashcard border rounded p-2 mt-3 mb-3 w-50" id="flashcard_template" style="display: none;">      
-      <h4 class="front" style="display: inline;">Front Text</h4>
-      <hr class="hr"/>
-      <h4 class="back" style="display: block;">Back Text</h4>
+        <textarea class="front-editing form-control" style="display: none;">Front Text</textarea>
+        <hr class="hr-editing" style="display: none;"/>
+        <textarea class="back-editing form-control" style="display: none;">Back Text</textarea>
 
-      <textarea class="front-editing" style="display: none;">Front Text</textarea>
-      <hr class="hr-editing" style="display: none;"/>
-      <textarea class="back-editing" style="display: none;">Back Text</textarea>
-
-      <a class="edit-btn position-relative float-end" style="display: inline;"><i class="fa-solid fa-pen-to-square fa"></i></a>
-      <button class="save-btn rounded mt-2" style="display: none;">Save</button>
-      <br />
+        <div class="d-flex align-content-center mt-3" style="column-gap: 5px;">
+          <a class="edit-btn cursor-pointer btn btn-primary"><i class="fa-solid fa-pen-to-square" style="cursor: pointer;"></i> Edit</a>
+          <button class="save-btn btn btn-primary" style="display: none;">
+            <i class="fa-solid fa-floppy-disk"></i>
+            Save
+          </button>
+          <button class="delete-flashcard btn btn-danger">
+            <i class="fa-solid fa-trash-alt"></i>
+            Delete
+          </button>
+          </div>
+      </div>
     </div>
   </div>
   <span id="studyset-id" style="display: none;">{{ study_set.id }}</span>

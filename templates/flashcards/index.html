@@ -10,18 +10,22 @@
     <i class="fa-solid fa-plus"></i>
     <a href="{{ url_for('post_new_studyset') }}">New Study Set</a>
   </button>
-  {% for s in study_sets %}
-    <div class="border rounded p-2 mt-3 mb-3 w-50">
-      <h3>
-        <a href="{{ url_for('get_view_study_set', id=s.id) }}">
-          {{ s.name }}
-        </a>
-      </h3>
-      <button class="rounded">
-        <a href="{{ url_for('study_studyset', id=s.id) }}">
-          STUDY
-        </a>
-      </button>
+
+    <div class="row" id="study-sets">
+      {% for set in study_sets %}
+        <div class="col-md-6 col-lg-4">
+          <div class="card mb-3">
+            <div class="card-body">
+              <h5 class="card-title mb-0">
+                <a href="{{ url_for('get_view_study_set', id=set.id) }}">{{ set.name }}</a>
+              </h5>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
     </div>
-  {% endfor %}
+
+    {% if study_sets|length == 0 %}
+      <p class="mb-0 text-muted">No recent sets</p>
+    {% endif %}
 {% endblock %}

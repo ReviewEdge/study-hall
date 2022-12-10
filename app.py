@@ -556,6 +556,20 @@ def study_studyset_prev(id):
     except KeyError:
         return study_studyset(id)
 
+@app.delete('/api/flashcards/<int:id>')
+@login_required
+def delete_flashcard(id):
+    flash_card = Flashcard.query.get_or_404(id)
+
+    # require ownership of the flashcard
+    if flash_card.study_set.ownerID != int(current_user.get_id()):
+        flash("You are not the owner!")
+        return "not authorized", 403
+
+    db.session.delete(flash_card)
+    db.session.commit()
+    return "success", 200
+
 ###############################################################################
 # Timer Data Handling
 ###############################################################################
