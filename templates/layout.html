@@ -25,7 +25,7 @@
 <body>
   <nav class="navbar navbar-dark bg-dark navbar-expand-md">
     <div class="container">
-      <a class="navbar-brand" href="{{ url_for('index') }}"><img src="/static/images/Logo-sm.png" height = 50> Study Hall</a>
+      <a class="navbar-brand" href="{{ url_for('index') }}"><img src="/static/images/Logo-sm.png" height = 50></a>
       <div class="navbar-brand" id="timer-div">
         <span id="timer">00:00</span>
         <br>
@@ -37,9 +37,6 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarNavDropdown">
         <ul class="navbar-nav me-auto">
-          <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="{{ url_for('index') }}">Home</a>
-          </li>
           <li class="nav-item">
             <a class="nav-link" href="{{ url_for('get_notes') }}">My Notes</a>
           </li>

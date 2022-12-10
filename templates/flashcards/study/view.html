@@ -18,11 +18,15 @@
       <div id="back">
         <h4>{{ current_flashcard.back_text }}</h4>
       </div>
-    </div>
+    </div> 
     <br />
     <br />
-    <button><a href="/api/study/{{ study_set.id }}/prev"><</a></button>
-    <button><a href="/api/study/{{ study_set.id }}/next">></a></button>
+    <a href="/api/study/{{ study_set.id }}/prev">
+      <i class="fa fa-chevron-left fa-2x px-2" aria-hidden="true"></i>
+    </a>
+    <a href="/api/study/{{ study_set.id }}/next">
+      <i class="fa fa-chevron-right fa-2x px-2" aria-hidden="true"></i>
+    </a>
   {% else %}
     <h3>No cards in set.</h3>
   {% endif %}
